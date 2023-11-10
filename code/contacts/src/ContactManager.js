@@ -1,6 +1,5 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import searchIcon from './images/search.png';
 import editIcon from './images/edit.png';
 import deleteIcon from './images/trash.png';
 
@@ -66,22 +65,11 @@ export default function ContactManager(){
         
         );
 
-        useEffect(()=>{
-            handleSearch();
-        }, [searchName]);
+        
 
         const [storeContacts, setStoreContacts] = useState(contacts);
 
-        const getTrElementByKey = (key) => {
-            const trElements = document.querySelectorAll('tr');
-            for (const tr of trElements) {
-
-              if (tr.firstChild.firstChild.data === key) {
-                return key;
-              }
-            }
-            return null;
-        };
+        
 
         useEffect(()=>{
             checkNumber();
@@ -106,21 +94,10 @@ export default function ContactManager(){
             setNumMsg([]);
             if(checkNumber()){
                 console.log("submited");
-                fetch("localhost:5000/contacts",{
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        name: addName,
-                        number: addNumber,
-                        email: addMail
-                    }).then(()=>{console.log("working")})
-                })
-                //setContacts(prev => [...prev, {name: addName, number: addNumber, email: addMail}]);
+                setContacts(prev => [...prev, {name: addName, number: addNumber, email: addMail}]);
                 
                 sortContacts();
-                setStoreContacts(contacts);
+                setStoreContacts(prev => [...prev, {name: addName, number: addNumber, email: addMail}]);
                 setAdding(false);
             }
             
@@ -143,8 +120,19 @@ export default function ContactManager(){
                 });
                 return sortedContacts;
             })
-            setStoreContacts(contacts);
         }
+
+        const getTrElementByKey = (key) => {
+            const trElements = document.querySelectorAll('tr');
+            for (const tr of trElements) {
+                
+              if (tr.firstChild.firstChild.data === key) {
+                console.log(key);
+                return key;
+              }
+            }
+            return null;
+        };
 
         const deleteContact = (key) => {
             const deleteKey = getTrElementByKey(key);
@@ -171,8 +159,12 @@ export default function ContactManager(){
 
             return searchedArr;
         });
-        console.log(storeContacts);
+        sortContacts();
     }
+
+    useEffect(()=>{
+        handleSearch();
+    }, [searchName]);
 
     return (
         <div className="flex flex-col w-screen h-screen items-center justify-start gap-7">
@@ -238,11 +230,17 @@ export default function ContactManager(){
                     </tr>
                 </thead>
                 <tbody>
-                    {contacts.map((contact)=>{
-                        return (<tr key={contact.name} className='row'>
-                            <td className='cell p-2'>{contact.name}</td>
-                            <td className='cell p-2'>{contact.email}</td>
-                            <td className='cell p-2'>{contact.number}</td>
+                    {contacts.map((contact, index)=>{
+                        return (<tr key={index} className='row'>
+                            <td className='cell p-2'>
+                                {contact.name}
+                            </td>
+                            <td className='cell p-2'>
+                                {contact.email}
+                            </td>
+                            <td className='cell p-2'>
+                                {contact.number}
+                            </td>
                             <td className='cell text-center p-2' colSpan="1">
                                 <button className='actionBtn' title='Edit Contact'>
                                     <img src={editIcon} alt="edit"
@@ -255,8 +253,7 @@ export default function ContactManager(){
                                 onClick={()=>{deleteContact(contact.name)}}>
                                     <img src={deleteIcon} alt="delete"
                                     className="h-5/6"
-                                    />
-                                    
+                                    />    
                                 </button>
                             </td>
                             
