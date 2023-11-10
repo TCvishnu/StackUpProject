@@ -106,7 +106,18 @@ export default function ContactManager(){
             setNumMsg([]);
             if(checkNumber()){
                 console.log("submited");
-                setContacts(prev => [...prev, {name: addName, number: addNumber, email: addMail}]);
+                fetch("localhost:5000/contacts",{
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: addName,
+                        number: addNumber,
+                        email: addMail
+                    }).then(()=>{console.log("working")})
+                })
+                //setContacts(prev => [...prev, {name: addName, number: addNumber, email: addMail}]);
                 
                 sortContacts();
                 setStoreContacts(contacts);
