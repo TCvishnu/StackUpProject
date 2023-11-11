@@ -3,16 +3,21 @@ import { useState, useEffect } from 'react';
 import editIcon from './images/edit.png';
 import deleteIcon from './images/trash.png';
 
-export default function ContactManager(){
+export default function ContactManager(props){
     const [adding, setAdding] = useState(false);
+    const [editing, setEditing] = useState(false);
 
     const [addName, setAddName] = useState('');
     const [addMail, setAddMail] = useState('');
     const [addNumber, setAddNumber] = useState('');
 
+    const [editedName, setEditedName] = useState('');
+    const [editedMail, setEditedMail] = useState('');
+    const [editedNumber, setEditedNumber] = useState('');
+
     const [searchName, setSearchName] = useState('');
    
-
+    const [beforeEditContact, setBeforeEditContact] = useState({});
     const [numMsg , setNumMsg] = useState([]);
     const [contacts, setContacts] = useState(
         [
@@ -68,7 +73,8 @@ export default function ContactManager(){
         
 
         const [storeContacts, setStoreContacts] = useState(contacts);
-
+        const [openDialogue, setOpenDialogue] = useState(false);
+        const [confirmLogOut, setConfirmLogOut] = useState(false);
         
 
         useEffect(()=>{
@@ -127,7 +133,7 @@ export default function ContactManager(){
             for (const tr of trElements) {
                 
               if (tr.firstChild.firstChild.data === key) {
-                console.log(key);
+                //console.log(key);
                 return key;
               }
             }
@@ -141,8 +147,14 @@ export default function ContactManager(){
                     return contact.name !== deleteKey;
                 })
             });
-
-            setStoreContacts(contacts);
+            
+            setStoreContacts((prev) => {
+                return prev.filter((contact) => {
+                    return contact.name !== deleteKey;
+                })
+            });
+            
+            
             
         }
 
@@ -166,15 +178,74 @@ export default function ContactManager(){
         handleSearch();
     }, [searchName]);
 
+    const handleEdit = (contact) => {
+        const editKey = getTrElementByKey(contact.name);
+        setEditing(true);
+        setBeforeEditContact(contact);
+        setEditedName(editKey);
+        setEditedMail(contact.email);
+        setEditedNumber(contact.number);
+        console.log(contact.email, contact.number);
+
+    }
+
+    const makeChanges = (event) => {
+        event.preventDefault();
+        setEditing(false);
+        setContacts((prev)=>{
+            let newContacts = prev.filter((contact) => {
+                return beforeEditContact.name !== contact.name;
+            });
+
+            const editedContact = {name: editedName, email: editedMail, number: editedNumber};
+            newContacts = [...newContacts, editedContact];
+            return newContacts;
+
+        });
+        setStoreContacts((prev)=>{
+            let newContacts = prev.filter((contact) => {
+                return beforeEditContact.name !== contact.name;
+            });
+
+            const editedContact = {name: editedName, email: editedMail, number: editedNumber};
+            newContacts = [...newContacts, editedContact];
+            return newContacts;
+        });
+
+        sortContacts();
+
+    }
+
+    const sendDataToLoginPage = () => {
+        props.onLogout();
+    }
+
     return (
         <div className="flex flex-col w-screen h-screen items-center justify-start gap-7">
             <h1 className="text-2xl mt-2">Pahv Contact Manager</h1>
-            <h1 className="text-xl">Welcome back 
-            <span> Kokkachi</span></h1>
+            <h1 className="text-xl">Welcome back <span>{props.user}</span></h1>
+
+            <button className=' absolute logOut rounded-full bg-blue-500 w-1/12 text-white hover:scale-110'
+            onClick={()=>{setOpenDialogue(true)}}>Log Out</button>
+            {openDialogue && <div className='flex flex-col fixed top-1/3 w-3/12 h-1/6
+             justify-center items-center bg-blue-400 dialogueDiv gap-7'>
+                <p className='w-full text-center'>Are you sure you want to Log out?</p>
+                <div className='flex flex-row gap-6 w-full items-center justify-center'>
+                    <button className='bg-white w-1/4 rounded-sm'
+                    onClick={()=> {
+                            sendDataToLoginPage();
+                            setOpenDialogue(false);
+                        }
+                    }>Yes</button>
+                    <button className=" bg-white w-1/4 rounded-sm" onClick={()=>{setOpenDialogue(false)}}>No</button>
+                </div>
+                
+            </div>}
                 
             <input type="text" 
-            placeholder="Search Contacts"
-            className="text-center rounded-full custom-shadow outline-none hover:scale-110"
+            placeholder="Search.."
+            className=" text-center rounded-sm w-2/12 custom-shadow outline-none hover:scale-110
+            text-lg "
             onChange={({target})=>{
                 setSearchName(target.value);
             }}>
@@ -183,10 +254,11 @@ export default function ContactManager(){
                 
            
             <button onClick={()=>{setAdding(true)}}
-                className='addBtn w-1/12 rounded-xl bg-slate-100'>Add Contact</button>
+                className='addBtn w-40 text-lg rounded-md bg-slate-100'>Add Contact</button>
             
 
-            {adding && <form className='flex flex-col w-3/12 gap-4 addForm items-center justify-center h-auto rounded-md'>
+            {adding && <form className='flex flex-col w-3/12 gap-4 addForm 
+            items-center justify-center fixed top-1/3 dialogueDiv h-auto rounded-md'>
                 <input className="text-center w-8/12 mt-2 rounded-md"
                  placeholder='Name' 
                  onChange={({target}) => setAddName(target.value)}
@@ -220,6 +292,25 @@ export default function ContactManager(){
                 })}
             </form>
             }
+
+            {editing && <form className='flex flex-col w-3/12 gap-4 addForm
+            dialogueDiv fixed top-1/3 items-center justify-center h-auto rounded-md'>
+                <input className='mt-2 rounded-md text-center' 
+                onChange={({target})=> {setEditedName(target.value)}}
+                value={editedName}></input>
+
+                <input className='rounded-md text-center' type="email"
+                onChange={({target}) => {setEditedMail(target.value)}}
+                value={editedMail}></input>
+
+                <input className='rounded-md text-center'
+                onChange={({target}) => {setEditedNumber(target.value)}}
+                value={editedNumber}
+                min="10"></input>
+
+                <button onClick={makeChanges}>Make Changes</button>
+                <button onClick={()=>{setEditing(false)}}>Cancel</button>
+            </form>}
             <table className="w-11/12 table table-shadow">
                 <thead>
                     <tr>
@@ -242,7 +333,8 @@ export default function ContactManager(){
                                 {contact.number}
                             </td>
                             <td className='cell text-center p-2' colSpan="1">
-                                <button className='actionBtn' title='Edit Contact'>
+                                <button className='actionBtn' title='Edit Contact'
+                                    onClick={() => {handleEdit(contact)}}>
                                     <img src={editIcon} alt="edit"
                                     className='h-5/6'/>
                                 </button>
