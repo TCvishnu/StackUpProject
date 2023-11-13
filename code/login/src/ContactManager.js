@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import editIcon from './images/trash.png';
+import editIcon from './images/edit.png';
 import deleteIcon from './images/trash.png';
 
 export default function ContactManager(props){
