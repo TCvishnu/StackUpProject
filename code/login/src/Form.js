@@ -19,7 +19,12 @@ export default function Form(props){
     const [wrongPassMsg, setWrongPassMsg] = useState([]);
 
     const [proceedLogin, setProceedLogin] = useState(true);
+    const [loginData, setLoginData] = useState([]);
+    const [invalidCred, setInvalidCred] = useState(false);
 
+    const sendDataToApp = (arr) => {
+      props.onLoginData(arr);
+    }
 
     useEffect(()=>{
         checkPassword();
@@ -61,17 +66,18 @@ export default function Form(props){
         setProceedLogin(true);
         event.preventDefault();
         if(!props.registration){
-          fetch("http://localhost:5000/login",{
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    username: username,
-                    password: pass
-                })
-            }).then(item=>item.json)
-            .then(item=>{console.log(item)})
+          for(const user of dataArr){
+            if((user.username === username) && (user.password === pass)){
+              setLoginData([username, true]);
+              console.log([username, true]);
+              setInvalidCred(false);
+              sendDataToApp([username, true]);
+              return;
+            }
+            
+          }
+          setInvalidCred(true);
+          return;
         }
         if(!checkEmail() && !checkPassword() && !checkUserName()){
             setProceedLogin(false)
@@ -110,8 +116,9 @@ export default function Form(props){
 
 
     return (
-    <div className="mainDivBg h-screen w-screen flex flex-col items-center justify-start">
-
+    
+    <div className=" h-screen w-screen flex flex-col items-center justify-start">
+    
         <h1 className="text-2xl font-bold mt-5">
           Welcome to pahv contact manager</h1>
 
@@ -183,6 +190,14 @@ export default function Form(props){
             Already have an account? Login to manage your contacts
         </p>
         }
+
+        {!props.registration && invalidCred && <div className="fixed flex justify-center
+        items-center rounded-md dialogueDiv  top-1/3 bg-slate-500 w-2/12 h-1/6">
+          <button className="absolute top-0 right-0 text-white
+           bg-red-500 w-1/12 h-5 flex flex-col justify-center items-center
+            rounded-sm text-lg" onClick={()=>{setInvalidCred(false)}}>x</button>
+          <p className="text-slate-50 text-lg">Invalid Credentials!!</p>
+        </div>}
       
     </div>
     );
