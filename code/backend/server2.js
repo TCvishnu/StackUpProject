@@ -47,7 +47,7 @@ app.all('/login', (req, res) => {
         const newData = req.body;
         const usernameToCheck = newData.username;
         const passwordToCheck = newData.password;
-
+        let data
         fs.readFile('data.json', 'utf8', (readErr, existingData) => {
             if (readErr) {
                 console.error(readErr);
@@ -56,8 +56,11 @@ app.all('/login', (req, res) => {
             else{
                 let parsedData = JSON.parse(existingData);
                 if (parsedData.some(user => user.username === usernameToCheck)){
-                    if(parsedData.some(user => user.password === passwordToCheck))
-                        res.json({response : true, username: user.username, data:user.contacts });
+                    if(parsedData.some(user => {
+                        data=user.contacts
+                        return user.password === passwordToCheck
+                    }))
+                        res.json({response : true,  data });
                     else
                         res.json({response : "password" });
                 }
