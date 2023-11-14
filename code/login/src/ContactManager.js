@@ -15,61 +15,14 @@ export default function ContactManager(props){
     const [editedName, setEditedName] = useState('');
     const [editedMail, setEditedMail] = useState('');
     const [editedNumber, setEditedNumber] = useState('');
+    const [editingKey, setEditingKey] = useState('');
 
     const [searchName, setSearchName] = useState('');
     const [dltContact, setDltContact] = useState('');
+    const [dltContactName, setDltContactName] = useState('');
     const [beforeEditContact, setBeforeEditContact] = useState({});
     const [numMsg , setNumMsg] = useState([]);
-    const [contacts, setContacts] = useState(
-        [
-            {
-                name: "Arun Nair",
-                number: 1234567890,
-                email: "arunnair@gmail.com"
-            },
-            {
-                name: "Divya Menon",
-                number: 9876543211,
-                email: "divyamenon@gmail.com"
-            },
-            {
-                name: "Krishna Pillai",
-                number: 2345678902,
-                email: "krishnapillai@gmail.com"
-            },
-            {
-                name: "Meera Kumar",
-                number: 8765432193,
-                email: "meerakumar@gmail.com"
-            },
-            {
-                name: "Sanjay Nambiar",
-                number: 3456789014,
-                email: "sanjaynambiar@gmail.com"
-            },
-            {
-                name: "Priya Iyer",
-                number: 7654321958,
-                email: "priyaiyer@gmail.com"
-            },
-            {
-                name: "Gopika Suresh",
-                number: 4567869012,
-                email: "gopikasuresh@gmail.com"
-            },
-            {
-                "name": "Rahul Menon",
-                "number": 6543271987,
-                "email": "rahulmenon@gmail.com"
-            },
-            {
-                name: "Nikhil Warrier",
-                number: 5432199876,
-                email: "nikhilwarrier@gmail.com"
-            }
-        ]
-        
-        );
+    const [contacts, setContacts] = useState(props.contacts);
 
         
 
@@ -99,13 +52,36 @@ export default function ContactManager(props){
         const handleSubmit = (event) => {
             event.preventDefault();
             setNumMsg([]);
-            if(checkNumber()){
+            /*if(checkNumber()){
                 console.log("submited");
                 setContacts(prev => [...prev, {name: addName, number: addNumber, email: addMail}]);
                 
                 sortContacts();
                 setStoreContacts(prev => [...prev, {name: addName, number: addNumber, email: addMail}]);
-                setAdding(false);
+                
+            }*/
+            if(checkNumber()){
+                console.log("submited");
+                fetch("http://localhost:5000/contacts",{
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: props.user,
+                        contacts:{
+                            name: addName,
+                            number: addNumber,
+                            email: addMail
+                        }
+                    })
+                }).then((item)=>item.json())
+                .then((item)=>{
+                    setStoreContacts(item.userData);
+                    setContacts(item.userData);
+                })
+                .then(()=>{setAdding(false);})
+
             }
             
         }
@@ -134,7 +110,6 @@ export default function ContactManager(props){
             for (const tr of trElements) {
                 
               if (tr.firstChild.firstChild.data === key) {
-                //console.log(key);
                 return key;
               }
             }
@@ -142,21 +117,17 @@ export default function ContactManager(props){
         };
 
         const deleteContact = (key) => {
-            const deleteKey = getTrElementByKey(key);
-            setContacts((prev) => {
-                return prev.filter((contact) => {
-                    return contact.name !== deleteKey;
-                })
-            });
-            
-            setStoreContacts((prev) => {
-                return prev.filter((contact) => {
-                    return contact.name !== deleteKey;
-                })
-            });
-            
-            
-            
+            console.log(key);
+              fetch("http://localhost:5000/delete",{
+               method: 'POST',
+               headers: {
+                   'Content-Type': 'application/json',
+              },
+               body: JSON.stringify({username:props.user,index: key})
+            }).then(item=>item.json())
+           .then(item=>{console.log(item);setContacts(item.userData); setStoreContacts(item.userData);
+        sortContacts();})
+    
         }
 
     const handleSearch = () => {
@@ -179,11 +150,12 @@ export default function ContactManager(props){
         handleSearch();
     }, [searchName]);
 
-    const handleEdit = (contact) => {
+    const handleEdit = (key ,contact) => {
         const editKey = getTrElementByKey(contact.name);
         setEditing(true);
+        setEditingKey(key);
         setBeforeEditContact(contact);
-        setEditedName(editKey);
+        setEditedName(contact.name);
         setEditedMail(contact.email);
         setEditedNumber(contact.number);
         console.log(contact.email, contact.number);
@@ -194,7 +166,16 @@ export default function ContactManager(props){
     const makeChanges = (event) => {
         event.preventDefault();
         setEditing(false);
-        setContacts((prev)=>{
+        fetch("http://localhost:5000/edit",{
+               method: 'POST',
+               headers: {
+                   'Content-Type': 'application/json',
+              },
+               body: JSON.stringify({username:props.user,index: editingKey, updatedContact: {name:editedName,number:editedNumber,email:editedMail}})
+            }).then(item=>item.json())
+           .then(item=>{setContacts(item.userData); setStoreContacts(item.userData);
+            sortContacts();})
+        /*setContacts((prev)=>{
             let newContacts = prev.filter((contact) => {
                 return beforeEditContact.name !== contact.name;
             });
@@ -214,8 +195,8 @@ export default function ContactManager(props){
             return newContacts;
         });
 
-        sortContacts();
-
+        */
+        
     }
 
     const sendDataToLoginPage = () => {
@@ -224,29 +205,29 @@ export default function ContactManager(props){
 
     return (
         <div className="flex flex-col w-screen h-screen items-center justify-start gap-7">
-            <h1 className="text-2xl mt-2">Pahv Contact Manager</h1>
-            <h1 className="text-xl">Welcome back <span>{props.user}</span></h1>
+            <h1 className="text-2xl mt-2 font-bold">PAHV CONTACT MANAGER</h1>
+            <h1 className="text-xl text-yellow-100">Welcome back <span>{props.user}</span></h1>
 
-            <button className=' absolute logOut rounded-full bg-blue-500 w-1/12 text-white hover:scale-110'
+            <button className=' absolute logOut rounded-full custom-btn w-1/12 text-white hover:scale-105 custom-inner-shadow btnColor'
             onClick={()=>{setOpenDialogue(true)}}>Log Out</button>
             {openDialogue && <div className='flex flex-col fixed top-1/3 w-3/12 h-1/6
-             justify-center items-center bg-blue-400 dialogueDiv gap-7'>
-                <p className='w-full text-center'>Are you sure you want to Log out?</p>
-                <div className='flex flex-row gap-6 w-full items-center justify-center'>
-                    <button className='bg-white w-1/4 rounded-sm'
+             justify-center items-center addForm dialogueDiv gap-7'>
+                <p className='w-full text-center text-white'>Are you sure you want to Log out?</p>
+                <div className='flex flex-row gap-6 w-full items-center justify-center mb-3'>
+                    <button className='bg-white text-white w-1/4 rounded custom-btn'
                     onClick={()=> {
                             sendDataToLoginPage();
                             setOpenDialogue(false);
                         }
                     }>Yes</button>
-                    <button className=" bg-white w-1/4 rounded-sm" onClick={()=>{setOpenDialogue(false)}}>No</button>
+                    <button className=" bg-white text-white w-1/4 rounded custom-btn" onClick={()=>{setOpenDialogue(false)}}>No</button>
                 </div>
                 
             </div>}
                 
             <input type="text" 
             placeholder="Search.."
-            className=" text-center rounded-sm w-2/12 custom-shadow outline-none hover:scale-110
+            className=" text-center rounded w-2/12 custom-shadow outline-none hover:scale-105
             text-lg "
             onChange={({target})=>{
                 setSearchName(target.value);
@@ -256,22 +237,22 @@ export default function ContactManager(props){
                 
            
             <button onClick={()=>{setAdding(true)}}
-                className='addBtn w-40 text-lg rounded-md bg-slate-100
-                hover:scale-110'>Add Contact</button>
+                className='addBtn w-40 text-white text-lg rounded-md bg-slate-100
+                hover:scale-105 custom-inner-shadow custom-btn'>Add Contact</button>
             
 
             {adding && <form className='flex flex-col w-3/12 gap-4 addForm 
             items-center justify-center fixed top-1/3 dialogueDiv h-auto rounded-md'>
-                <input className="text-center w-8/12 mt-2 rounded-md"
+                <input className="text-center w-8/12 mt-2 rounded-md custom-shadow"
                  placeholder='Name' 
                  onChange={({target}) => setAddName(target.value)}
                  required></input>
-                <input className="text-center w-8/12 rounded-md" 
+                <input className="text-center w-8/12 rounded-md custom-shadow custom-inner-shadow" 
                 type="email"
                 placeholder='Email' 
                 onChange={({target}) => setAddMail(target.value)}
                 required></input>
-                <input className='text-center w-8/12 rounded-md' 
+                <input className='text-center w-8/12 rounded-md custom-shadow custom-inner-shadow' 
                 
                 placeholder='Number'
                 min="10"
@@ -284,11 +265,11 @@ export default function ContactManager(props){
                 required></input>
 
                 <input type="submit" value={"Add Contact"}
-                className='w-6/12 bg-slate-100 rounded-full'
+                className='w-6/12 text-white bg-slate-100 rounded-full shadow-2xl hover:scale-105 custom-inner-shadow custom-btn'
                 onClick={handleSubmit}></input>
 
                 <button onClick={()=>{setAdding(false)}}
-                className='w-6/12 bg-slate-100 mb-2 rounded-full'>Close</button>
+                className='w-6/12 text-white bg-slate-100 mb-2 rounded-full shadow-2xl hover:scale-105 custom-inner-shadow custom-btn'>Close</button>
 
                 {numMsg.map((message) => {
                     return <p key={message}className='text-xs text-white'>{message}</p>
@@ -298,40 +279,40 @@ export default function ContactManager(props){
 
             {editing && <form className='flex flex-col w-3/12 gap-4 addForm
             dialogueDiv fixed top-1/3 items-center justify-center h-auto rounded-md'>
-                <input className='mt-2 rounded-md text-center' 
+                <input className='mt-2 rounded-md text-center custom-shadow' 
                 onChange={({target})=> {setEditedName(target.value)}}
                 value={editedName}></input>
 
-                <input className='rounded-md text-center' type="email"
+                <input className='rounded-md text-center custom-shadow' type="email"
                 onChange={({target}) => {setEditedMail(target.value)}}
                 value={editedMail}></input>
 
-                <input className='rounded-md text-center'
+                <input className='rounded-md text-center custom-shadow'
                 onChange={({target}) => {setEditedNumber(target.value)}}
                 value={editedNumber}
                 min="10"></input>
 
-                <button onClick={makeChanges}>Make Changes</button>
-                <button onClick={()=>{setEditing(false)}}>Cancel</button>
+                <button className='w-6/12 text-white bg-slate-100 rounded-full shadow-2xl hover:scale-105 custom-inner-shadow custom-btn' onClick={makeChanges}>Make Changes</button>
+                <button className='w-6/12 text-white bg-slate-100 rounded-full mb-4 shadow-2xl hover:scale-105 custom-inner-shadow custom-btn' onClick={()=>{setEditing(false)}}>Cancel</button>
             </form>}
 
             {deleting && <div className='flex flex-col w-3/12 gap-2 addForm
             dialogueDiv fixed top-1/3 items-center justify-center h-1/6 rounded-md'>
-                <p className='text-white'>Delete {dltContact} ?</p>
+                <p className='text-white'>Delete {dltContactName} ?</p>
                 <div className='w-full flex flex-row items-center justify-center gap-5'>
                 <button onClick={()=>{
                     setDeleting(false);
                     deleteContact(dltContact);
                 }}
-                className="rounded-sm bg-white w-3/12"
+                className="rounded text-white bg-white w-3/12 custom-btn"
                 >Yes</button>
                 <button onClick={()=>{setDeleting(false)}}
-                className='rounded-sm bg-white w-3/12'
+                className='rounded text-white bg-white w-3/12 custom-btn'
                 >No</button>
                 </div>
             </div>}
 
-            <table className="w-11/12 table table-shadow">
+            <table className="w-11/12 table custom-table">
                 <thead>
                     <tr>
                         <th className='w-1/5 header-cell'>Name</th>
@@ -342,28 +323,29 @@ export default function ContactManager(props){
                 </thead>
                 <tbody>
                     {contacts.map((contact, index)=>{
-                        return (<tr key={index} className='row hover:bg-slate-100'>
-                            <td className='cell p-2 hover:bg-slate-300'>
+                        return (<tr key={index} className='row '>
+                            <td className='cell p-2 '>
                                 {contact.name}
                             </td>
-                            <td className='cell p-2 hover:bg-slate-300'>
+                            <td className='cell p-2 '>
                                 {contact.email}
                             </td>
-                            <td className='cell p-2 hover:bg-slate-300'>
+                            <td className='cell p-2 '>
                                 {contact.number}
                             </td>
-                            <td className='cell text-center p-2 hover:bg-slate-300' colSpan="1">
+                            <td className='cell text-center p-2 ' colSpan="1">
                                 <button className='actionBtn ' title='Edit Contact'
-                                    onClick={() => {handleEdit(contact)}}>
+                                    onClick={() => {handleEdit(index, contact)}}>
                                     <img src={editIcon} alt="edit"
                                     className='h-5/6'/>
                                 </button>
                             </td>
-                            <td className='cell text-center p-2 hover:bg-slate-300' colSpan="1">
+                            <td className='cell text-center p-2' colSpan="1">
                                 <button className='actionBtn' 
                                 title="Delete Contact"
-                                onClick={()=>{setDltContact(contact.name);
-                                setDeleting(true);}}>
+                                onClick={()=>{setDltContact(index);
+                                setDeleting(true);
+                                setDltContactName(contact.name)}}>
                                     <img src={deleteIcon} alt="delete"
                                     className="h-5/6"
                                     />    
