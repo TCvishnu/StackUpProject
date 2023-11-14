@@ -34,10 +34,7 @@ export default function Form(props){
     useEffect(()=>{
         checkPassword();
     }, [pass]);
-    const [dataArr, setDataArr] = useState([
-      {username: 'Vishnutc',email: 'vishnu@gmail.com', password: 'v!shnu69', favMovie: 'ABCD', favFood: 'Paneer'},
-      {username: 'DinganN',email: 'dingan@gmail.com', password: 'd!ngan03', favMovie: 'UVWXYZ', favFood: 'Chicken'}
-    ]);
+    
 
   const checkPassword = () => {
     setWrongPassMsg([]);
@@ -72,7 +69,7 @@ export default function Form(props){
         event.preventDefault();
         if(!props.registration){
           
-            fetch("http://localhost:5000/login",{
+            fetch("https://coma.onrender.com/login",{
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -100,7 +97,7 @@ export default function Form(props){
             //console.log("Valid signup");
             //setProceedLogin(false);
             setInvalidReg(false);
-            fetch("http://localhost:5000/signup",{
+            fetch("https://coma.onrender.com/signup",{
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -136,10 +133,6 @@ export default function Form(props){
         return false;
       }
       return true;
-    }
-
-    const handleForgotPassword = () => {
-      alert("Wait to recover!!");
     }
 
 
@@ -212,10 +205,10 @@ export default function Form(props){
         wrongPassMsg.map(message => 
         <p className="text-xs text-white">{message}</p>)}
 
-        {!props.registration && <button className="mt-4 text-md underline text-white"
+        {/*!props.registration && <button className="mt-4 text-md underline text-white"
           onClick={handleForgotPassword}
           type="reset">
-          forgot password?</button>}
+        forgot password?</button>*/}
 
       </form>
 
