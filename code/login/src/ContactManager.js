@@ -20,7 +20,7 @@ export default function ContactManager(props){
     const [searchName, setSearchName] = useState('');
     const [dltContact, setDltContact] = useState('');
     const [dltContactName, setDltContactName] = useState('');
-    const [beforeEditContact, setBeforeEditContact] = useState({});
+    //const [beforeEditContact, setBeforeEditContact] = useState({});
     const [numMsg , setNumMsg] = useState([]);
     const [contacts, setContacts] = useState(props.contacts);
 
@@ -28,7 +28,7 @@ export default function ContactManager(props){
 
         const [storeContacts, setStoreContacts] = useState(contacts);
         const [openDialogue, setOpenDialogue] = useState(false);
-        const [confirmLogOut, setConfirmLogOut] = useState(false);
+        //const [confirmLogOut, setConfirmLogOut] = useState(false);
         
 
         useEffect(()=>{
@@ -62,7 +62,7 @@ export default function ContactManager(props){
             }*/
             if(checkNumber()){
                 console.log("submited");
-                fetch("http://localhost:5000/contacts",{
+                fetch("https://coma.onrender.com/contacts",{
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -105,7 +105,7 @@ export default function ContactManager(props){
             })
         }
 
-        const getTrElementByKey = (key) => {
+        /*const getTrElementByKey = (key) => {
             const trElements = document.querySelectorAll('tr');
             for (const tr of trElements) {
                 
@@ -114,11 +114,11 @@ export default function ContactManager(props){
               }
             }
             return null;
-        };
+        };*/
 
         const deleteContact = (key) => {
             console.log(key);
-              fetch("http://localhost:5000/delete",{
+              fetch("https://coma.onrender.com/delete",{
                method: 'POST',
                headers: {
                    'Content-Type': 'application/json',
@@ -151,10 +151,10 @@ export default function ContactManager(props){
     }, [searchName]);
 
     const handleEdit = (key ,contact) => {
-        const editKey = getTrElementByKey(contact.name);
+        //const editKey = getTrElementByKey(contact.name);
         setEditing(true);
         setEditingKey(key);
-        setBeforeEditContact(contact);
+        //setBeforeEditContact(contact);
         setEditedName(contact.name);
         setEditedMail(contact.email);
         setEditedNumber(contact.number);
@@ -166,7 +166,7 @@ export default function ContactManager(props){
     const makeChanges = (event) => {
         event.preventDefault();
         setEditing(false);
-        fetch("http://localhost:5000/edit",{
+        fetch("https://coma.onrender.com/edit",{
                method: 'POST',
                headers: {
                    'Content-Type': 'application/json',
@@ -251,7 +251,7 @@ export default function ContactManager(props){
                 type="email"
                 placeholder='Email' 
                 onChange={({target}) => setAddMail(target.value)}
-                required></input>
+                ></input>
                 <input className='text-center w-8/12 rounded-md custom-shadow custom-inner-shadow' 
                 
                 placeholder='Number'
@@ -292,7 +292,7 @@ export default function ContactManager(props){
                 value={editedNumber}
                 min="10"></input>
 
-                <button className='w-6/12 text-white bg-slate-100 rounded-full shadow-2xl hover:scale-105 custom-inner-shadow custom-btn' onClick={makeChanges}>Make Changes</button>
+                <button className='w-6/12  text-white bg-slate-100 rounded-full shadow-2xl hover:scale-105 custom-inner-shadow custom-btn' onClick={makeChanges}>Make Changes</button>
                 <button className='w-6/12 text-white bg-slate-100 rounded-full mb-4 shadow-2xl hover:scale-105 custom-inner-shadow custom-btn' onClick={()=>{setEditing(false)}}>Cancel</button>
             </form>}
 
