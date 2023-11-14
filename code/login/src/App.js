@@ -24,7 +24,7 @@ function App() {
 
   const handleFormData = (data) => {
     setLoginData(data);
-    //console.log(AppJS ${data});
+    //console.log(`AppJS ${data}`);
     setCurPage('Contacts');
     setIsContactPage(data[1]);
   }
@@ -54,7 +54,7 @@ function App() {
         {(curPage === 'Registration')? 'Login': 'Go back'}
       </button>}
 
-      {isContactPage && <ContactManager user={loginData[0]} onLogout={comeBackToLoginPage}/>}
+      {isContactPage && <ContactManager user={loginData[0]} contacts={loginData[2]} onLogout={comeBackToLoginPage}/>}
     </div>
   );
 }
