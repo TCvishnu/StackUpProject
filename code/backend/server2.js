@@ -11,6 +11,7 @@ app.use(cors());
 app.all('/signup', (req, res) => {
     if (req.method === 'POST' || req.method === 'PUT') {
         const newData = req.body;
+        newData.contacts = [];
         const usernameToCheck = newData.username;
         const emailToCheck = newData.email;
 
@@ -60,7 +61,7 @@ app.all('/login', (req, res) => {
                         data=user.contacts
                         return user.password === passwordToCheck
                     }))
-                        res.json({response : true,  data });
+                        res.json({response : true, data });
                     else
                         res.json({response : "password" });
                 }
@@ -184,7 +185,16 @@ app.all('/edit', (req, res) => {
             if (contactIndexToEdit >= 0 && contactIndexToEdit < parsedData[userIndex].contacts.length) {
                 // Edit the contact based on the specified index
                 parsedData[userIndex].contacts[contactIndexToEdit] = { ...updatedContactData };
+                parsedData[userIndex].contacts.sort((a,b)=>{
+                    const nameA=a.name.toUpperCase()
+                    const nameB=b.name.toUpperCase()
 
+                    if(nameA<nameB)
+                        return -1
+                    if (nameA>nameB)
+                        return 1
+                    return 0
+                })
                 fs.writeFile('data.json', JSON.stringify(parsedData, null, 2), 'utf8', (writeErr) => {
                     if (writeErr) {
                         console.error(writeErr);
