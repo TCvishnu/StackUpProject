@@ -5,45 +5,103 @@
     "password": "Hri@2cjhg",
     "contacts": [
       {
-        "name": "delete3",
-        "number": "7654321890",
-        "email": "emails@gmail.com"
+        "name": "Jimki Kammal",
+        "number": "5555555555",
+        "email": "jimki@gmail.com"
       },
       {
-        "name": "hjkl",
-        "number": "1234567890",
-        "email": "ghjk@fghj.uyfd"
+        "name": "Pranav K T",
+        "number": "1234444432",
+        "email": "pra@gmail.com"
       },
       {
-        "name": "iijnini",
-        "number": "3214567890",
+        "name": "qhrdya",
+        "number": "3214567896",
         "email": "asdf@gmail.com"
       },
       {
-        "name": "pranav",
+        "name": "Quasigone",
         "number": "9999999999",
         "email": "gmail@email.com"
       },
       {
-        "name": "pranav",
-        "number": "9999999999",
+        "name": "Shreya",
+        "number": "767471691274",
         "email": "gmail@email.com"
       },
       {
-        "name": "pranav",
-        "number": "9999999999",
-        "email": "gmail@email.com"
+        "name": "Vishnu t c",
+        "number": "6969696969",
+        "email": "bichanu@gmail.com"
       },
       {
-        "name": "tyui",
-        "number": "1234567890",
-        "email": "fghj@ghj.fgh"
+        "name": "wsdfguytxrc",
+        "number": "3476423678",
+        "email": "ddgfthg@gmail.com"
       }
     ]
   },
   {
-    "username": "dghghf",
-    "email": "ytuurty@gmail.com",
-    "password": "Swert456y5@##"
+    "username": "Adithyan",
+    "email": "adi@gmail.com",
+    "password": "Ad1t#an8",
+    "contacts": []
+  },
+  {
+    "username": "Sama",
+    "email": "sama@gmail.com",
+    "password": "Sam@1098",
+    "contacts": []
+  },
+  {
+    "username": "Samakkk",
+    "email": "samakkk@gmail.com",
+    "password": "Sam@1098",
+    "contacts": []
+  },
+  {
+    "username": "Akash Kumar",
+    "email": "akash@gmail.com",
+    "password": "Ak@sh130",
+    "contacts": []
+  },
+  {
+    "username": "Vishnutc",
+    "email": "nutc@gmail.com",
+    "password": "V!shnu13",
+    "contacts": [
+      {
+        "name": "Adithyan",
+        "number": "1234567890",
+        "email": "adi@gmail.com"
+      },
+      {
+        "name": "Sama",
+        "number": "0987654321",
+        "email": "sama@gmail.com"
+      },
+      {
+        "name": "Vizag",
+        "number": "2310345601",
+        "email": "vyzag@gmail.com"
+      }
+    ]
+  },
+  {
+    "username": "DinganN",
+    "email": "dingan@gmail.com",
+    "password": "Dindan@123",
+    "contacts": [
+      {
+        "name": "Kokkaachi",
+        "number": "6969696969",
+        "email": "Kokk69@gmail.com"
+      },
+      {
+        "name": "Kuttappi",
+        "number": "9999999999",
+        "email": "Kuttappi@gmail.com"
+      }
+    ]
   }
 ]
