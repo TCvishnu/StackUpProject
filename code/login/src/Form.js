@@ -16,10 +16,15 @@ export default function Form(props){
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [pass, setPass] = useState('');
+    const [favMovie, setFavMovie] = useState('');
+    const [favFood, setFavFood] = useState('');
     const [wrongPassMsg, setWrongPassMsg] = useState([]);
 
-    const [proceedLogin, setProceedLogin] = useState(true);
-    const [loginData, setLoginData] = useState([]);
+    //const [proceedLogin, setProceedLogin] = useState(true);
+    //const [loginData, setLoginData] = useState([]);
+    const [invalidReg, setInvalidReg] = useState(false);
+    const [validReg, setValidReg] = useState(false);
+    const [invalidResponse, setInvalidResponse] = useState('');
     const [invalidCred, setInvalidCred] = useState(false);
 
     const sendDataToApp = (arr) => {
@@ -63,24 +68,38 @@ export default function Form(props){
     
   } 
     const handleSubmit = (event) => {
-        setProceedLogin(true);
+        //setProceedLogin(true);
         event.preventDefault();
         if(!props.registration){
-          for(const user of dataArr){
-            if((user.username === username) && (user.password === pass)){
-              setLoginData([username, true]);
-              console.log([username, true]);
-              setInvalidCred(false);
-              sendDataToApp([username, true]);
-              return;
-            }
-            
-          }
-          setInvalidCred(true);
+          
+            fetch("http://localhost:5000/login",{
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: pass
+                })
+            }).then(item=>item.json())
+            .then(item=>{
+                console.log(item)
+                if (item.response===true){
+                    //setLoginData([username, true, item.data]);
+                    setInvalidCred(false);
+                    sendDataToApp([username, true, item.data]);
+                } else {
+                    setInvalidCred(true);
+                }
+                
+            })   
+          
           return;
         }
-        if(!checkEmail() && !checkPassword() && !checkUserName()){
-            setProceedLogin(false)
+        if(checkEmail() && checkPassword()){
+            //console.log("Valid signup");
+            //setProceedLogin(false);
+            setInvalidReg(false);
             fetch("http://localhost:5000/signup",{
                 method: 'POST',
                 headers: {
@@ -91,23 +110,32 @@ export default function Form(props){
                     email: email,
                     password: pass
                 })
-            }).then(console.log('working'))
+            }).then(item => item.json())
+            .then(item => {
+              console.log(item.response);
+              
+              setInvalidResponse(item.response);
+              if (item.response === true){
+                setValidReg(true);
+                setUsername('');
+                setEmail('');
+                setPass('');
+                setFavFood('');
+                setFavMovie('');
+                document.getElementById('password').value = '';
+              } else {
+                setInvalidReg(true);
+              }
+            })
         }
-    }
-
-    const checkUserName = () => {
-      for(const user of dataArr){
-        if(username === user.username){
-          alert("Username exists already");
-          return false;
-        }
-      }
     }
 
     const checkEmail = () => {
       if(!emailPattern.test(email)){
+        console.log(email, emailPattern.test(email));
         return false;
       }
+      return true;
     }
 
     const handleForgotPassword = () => {
@@ -154,9 +182,13 @@ export default function Form(props){
             <p className="text-sm text-white" title="These will be used for forgot password?">Answer the 2 security Questions</p>
             <input type="text" 
             placeholder="What is your Favourite Movie?" 
+            onChange={({target}) => {setFavMovie(target.value)}}
+            value={favMovie}
             className="text-sm w-1/2 text-center inpField" required></input>
             <input type="text" 
             placeholder="What is your Favourite Food?"
+            value={favFood}
+            onChange={({target})=>{setFavFood(target.value)}}
             className="text-sm w-1/2 text-center inpField" required></input>
           </div>}
         
@@ -186,13 +218,32 @@ export default function Form(props){
           forgot password?</button>}
 
       </form>
+
+      {props.registration && invalidReg && <div 
+      className="fixed dialogueDiv top-1/3 w-68 h-32 addForm flex flex-col
+      items-center justify-center">
+          <p className="text-white text-center">Unavailable {invalidResponse}. Try a different {invalidResponse}</p>
+          <button 
+          className="absolute top-0 right-0 bg-red-500 w-5 rounded-sm"
+          onClick={()=>{setInvalidReg(false)}}>X</button>
+        </div>}
+
+      {props.registration && validReg && <div className="fixed dialogueDiv top-1/3 w-68 h-32 addForm flex flex-col
+      items-center justify-center">
+        <p className="text-white text-center">Registered Successfully!! Login to continue</p>
+        <button 
+          className="absolute top-0 right-0 bg-red-500 w-5 rounded-sm"
+          onClick={()=>{setValidReg(false)}}>X</button>
+        </div>}
+
+
         {props.registration && <p className="mt-3 mb-3 text-xl">
             Already have an account? Login to manage your contacts
         </p>
         }
 
         {!props.registration && invalidCred && <div className="fixed flex justify-center
-        items-center rounded-md dialogueDiv  top-1/3 bg-slate-500 w-2/12 h-1/6">
+        items-center rounded-md dialogueDiv top-1/3 bg-slate-500 w-2/12 h-1/6">
           <button className="absolute top-0 right-0 text-white
            bg-red-500 w-1/12 h-5 flex flex-col justify-center items-center
             rounded-sm text-lg" onClick={()=>{setInvalidCred(false)}}>x</button>
