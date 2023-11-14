@@ -9,7 +9,7 @@ Presenting our contact management system. Upon registration, users can convenien
 ## Team Id
 pahv
 ## Link to product walkthrough
-[link to video]
+[link to video](https://www.loom.com/share/2bbbd83eced3487497feba3d090017e4?sid=be913eb7-bf68-4e4f-badd-9fd93ed2ecdf)
 ## How it Works ?
 1. To create an account, users need to register, and their information is stored in the backend.
 2. Upon logging in, users are directed to a page displaying all the contacts they have saved.
@@ -22,6 +22,7 @@ pahv
 ## Libraries used
 React
 Express
+Tailwind
 ## How to configure
 Instructions for setting up project
 ## How to Run
