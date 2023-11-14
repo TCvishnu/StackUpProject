@@ -1,6 +1,6 @@
 import React from 'react';
 import {useState} from 'react';
-import Form from './Form';
+import Form from './Form2';
 import ContactManager from './ContactManager';
 
 const gotoLogClass = 'loginBtn mb-3 text-white';
